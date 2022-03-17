@@ -478,6 +478,7 @@ class _ImprovedScrollingState extends State<ImprovedScrolling> {
       final curve = widget.keyboardScrollConfig.scrollCurve;
 
       child = RawKeyboardListener(
+        autofocus: true,
         focusNode: _keyboardScrollFocusNode,
         onKey: (event) {
           if (isVerticalAxis) {
