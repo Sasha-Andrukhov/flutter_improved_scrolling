@@ -481,61 +481,58 @@ class _ImprovedScrollingState extends State<ImprovedScrolling> {
         focusNode: _keyboardScrollFocusNode,
         onKey: (event) {
           if (isVerticalAxis) {
+            var jumpDuration = arrowsScrollDuration;
+            double newOffset = 0;
+            bool scrollEvent = false;
+
             if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
-              scrollController.animateTo(
-                scrollController.offset + arrowsScrollAmount,
-                duration: arrowsScrollDuration,
-                curve: curve,
-              );
+              jumpDuration = arrowsScrollDuration;
+              newOffset = scrollController.offset + arrowsScrollAmount;
+              scrollEvent = true;
             } else if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
-              scrollController.animateTo(
-                scrollController.offset - arrowsScrollAmount,
-                duration: arrowsScrollDuration,
-                curve: curve,
-              );
+              jumpDuration = arrowsScrollDuration;
+              newOffset = scrollController.offset - arrowsScrollAmount;
+              scrollEvent = true;
             } else if (event.isKeyPressed(LogicalKeyboardKey.pageUp)) {
-              scrollController.animateTo(
-                scrollController.offset - pageUpDownScrollAmount,
-                duration: pageUpDownScrollDuration,
-                curve: curve,
-              );
+              jumpDuration = pageUpDownScrollDuration;
+              newOffset = scrollController.offset - pageUpDownScrollAmount;
+              scrollEvent = true;
             } else if (event.isKeyPressed(LogicalKeyboardKey.pageDown)) {
-              scrollController.animateTo(
-                scrollController.offset + pageUpDownScrollAmount,
-                duration: pageUpDownScrollDuration,
-                curve: curve,
-              );
+              jumpDuration = pageUpDownScrollDuration;
+              newOffset = scrollController.offset + pageUpDownScrollAmount;
+              scrollEvent = true;
             } else if (event.isShiftPressed &&
                 event.isKeyPressed(LogicalKeyboardKey.space)) {
-              scrollController.animateTo(
-                scrollController.offset - spaceScrollAmount,
-                duration: spaceScrollDuration,
-                curve: curve,
-              );
+              jumpDuration = spaceScrollDuration;
+              newOffset = scrollController.offset - spaceScrollAmount;
+              scrollEvent = true;
             } else if (event.isKeyPressed(LogicalKeyboardKey.space)) {
-              scrollController.animateTo(
-                scrollController.offset + spaceScrollAmount,
-                duration: spaceScrollDuration,
-                curve: curve,
-              );
+              jumpDuration = spaceScrollDuration;
+              newOffset = scrollController.offset + spaceScrollAmount;
+              scrollEvent = true;
             } else if (event.isKeyPressed(LogicalKeyboardKey.home)) {
-              scrollController.animateTo(
+              jumpDuration = homeScrollDurationBuilder?.call(
+                scrollController.offset,
                 scrollController.position.minScrollExtent,
-                duration: homeScrollDurationBuilder?.call(
-                      scrollController.offset,
-                      scrollController.position.minScrollExtent,
-                    ) ??
-                    defaultHomeEndScrollDuration,
-                curve: curve,
-              );
+              ) ??
+                  defaultHomeEndScrollDuration;
+              newOffset = scrollController.position.minScrollExtent;
+              scrollEvent = true;
             } else if (event.isKeyPressed(LogicalKeyboardKey.end)) {
-              scrollController.animateTo(
+              jumpDuration = endScrollDurationBuilder?.call(
+                scrollController.offset,
                 scrollController.position.maxScrollExtent,
-                duration: endScrollDurationBuilder?.call(
-                      scrollController.offset,
-                      scrollController.position.maxScrollExtent,
-                    ) ??
-                    defaultHomeEndScrollDuration,
+              ) ??
+                  defaultHomeEndScrollDuration;
+              newOffset = scrollController.position.maxScrollExtent;
+              scrollEvent = true;
+            }
+            if(scrollEvent){
+              if(newOffset<0)newOffset=0;
+              if(newOffset>scrollController.position.maxScrollExtent)newOffset=scrollController.position.maxScrollExtent;
+              scrollController.animateTo(
+                newOffset,
+                duration: jumpDuration,
                 curve: curve,
               );
             }
