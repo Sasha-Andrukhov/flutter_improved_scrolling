@@ -86,7 +86,7 @@ class ImprovedScrolling extends StatefulWidget {
   /// on the wrapped scrollable widget
   final bool enableCustomMouseWheelScrolling;
 
-  final bool checkNegativeOffset;;
+  final bool checkNegativeOffset;
 
   /// Configuration for programatically scrolling using mouse wheel
   final CustomMouseWheelScrollConfig customMouseWheelScrollConfig;
