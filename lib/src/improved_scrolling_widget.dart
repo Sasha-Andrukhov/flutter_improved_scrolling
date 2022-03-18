@@ -46,6 +46,7 @@ class ImprovedScrolling extends StatefulWidget {
     this.onScroll,
     this.onMMBScrollStateChanged,
     this.onMMBScrollCursorPositionUpdate,
+    this.checkNegativeOffset =true,
     required this.child,
   }) : super(key: key);
 
@@ -84,6 +85,8 @@ class ImprovedScrolling extends StatefulWidget {
   /// Useful in cases when using NeverScrollableScrollPhysics
   /// on the wrapped scrollable widget
   final bool enableCustomMouseWheelScrolling;
+
+  final bool checkNegativeOffset;;
 
   /// Configuration for programatically scrolling using mouse wheel
   final CustomMouseWheelScrollConfig customMouseWheelScrollConfig;
@@ -529,7 +532,7 @@ class _ImprovedScrollingState extends State<ImprovedScrolling> {
               scrollEvent = true;
             }
             if(scrollEvent){
-              if(newOffset<0)newOffset=0;
+              if(newOffset<0&&!widget.checkNegativeOffset)newOffset=0;
               if(newOffset>scrollController.position.maxScrollExtent)newOffset=scrollController.position.maxScrollExtent;
               scrollController.animateTo(
                 newOffset,
