@@ -532,7 +532,7 @@ class _ImprovedScrollingState extends State<ImprovedScrolling> {
               scrollEvent = true;
             }
             if(scrollEvent){
-              if(newOffset<0&&!widget.checkNegativeOffset)newOffset=0;
+              if(newOffset<scrollController.position.minScrollExtent&&widget.checkNegativeOffset)newOffset=scrollController.position.minScrollExtent;
               if(newOffset>scrollController.position.maxScrollExtent)newOffset=scrollController.position.maxScrollExtent;
               scrollController.animateTo(
                 newOffset,
