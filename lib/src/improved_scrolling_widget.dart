@@ -47,6 +47,7 @@ class ImprovedScrolling extends StatefulWidget {
     this.onMMBScrollStateChanged,
     this.onMMBScrollCursorPositionUpdate,
     this.checkNegativeOffset =true,
+    this.blockKeysScrolling =false,
     required this.child,
   }) : super(key: key);
 
@@ -87,6 +88,8 @@ class ImprovedScrolling extends StatefulWidget {
   final bool enableCustomMouseWheelScrolling;
 
   final bool checkNegativeOffset;
+
+  final bool blockKeysScrolling;
 
   /// Configuration for programatically scrolling using mouse wheel
   final CustomMouseWheelScrollConfig customMouseWheelScrollConfig;
@@ -410,23 +413,26 @@ class _ImprovedScrollingState extends State<ImprovedScrolling> {
           final duration = widget.customMouseWheelScrollConfig.scrollDuration;
           final curve = widget.customMouseWheelScrollConfig.scrollCurve;
 
-          if (scrollDelta.isNegative) {
-            mouseWheelForwardThrottler.run(() {
-              scrollController.animateTo(
-                math.max(0.0, newOffset),
-                duration: duration,
-                curve: curve,
-              );
-            });
-          } else {
-            mouseWheelBackwardThrottler.run(() {
-              scrollController.animateTo(
-                math.min(scrollController.position.maxScrollExtent, newOffset),
-                duration: duration,
-                curve: curve,
-              );
-            });
+          if(!widget.blockKeysScrolling){
+            if (scrollDelta.isNegative) {
+              mouseWheelForwardThrottler.run(() {
+                scrollController.animateTo(
+                  math.max(0.0, newOffset),
+                  duration: duration,
+                  curve: curve,
+                );
+              });
+            } else {
+              mouseWheelBackwardThrottler.run(() {
+                scrollController.animateTo(
+                  math.min(scrollController.position.maxScrollExtent, newOffset),
+                  duration: duration,
+                  curve: curve,
+                );
+              });
+            }
           }
+
         }
       },
       child: Stack(
@@ -534,11 +540,13 @@ class _ImprovedScrollingState extends State<ImprovedScrolling> {
             if(scrollEvent){
               if(newOffset<scrollController.position.minScrollExtent&&widget.checkNegativeOffset)newOffset=scrollController.position.minScrollExtent;
               if(newOffset>scrollController.position.maxScrollExtent)newOffset=scrollController.position.maxScrollExtent;
-              scrollController.animateTo(
-                newOffset,
-                duration: jumpDuration,
-                curve: curve,
-              );
+              if(!widget.blockKeysScrolling){
+                scrollController.animateTo(
+                  newOffset,
+                  duration: jumpDuration,
+                  curve: curve,
+                );
+              }
             }
           } else {
             //
@@ -547,19 +555,20 @@ class _ImprovedScrollingState extends State<ImprovedScrolling> {
             if (event.isShiftPressed != _isShiftPressedDown) {
               setShiftPressedDown(event.isShiftPressed);
             }
-
-            if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
-              scrollController.animateTo(
-                scrollController.offset - arrowsScrollAmount,
-                duration: arrowsScrollDuration,
-                curve: curve,
-              );
-            } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
-              scrollController.animateTo(
-                scrollController.offset + arrowsScrollAmount,
-                duration: arrowsScrollDuration,
-                curve: curve,
-              );
+            if(!widget.blockKeysScrolling){
+              if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+                scrollController.animateTo(
+                  scrollController.offset - arrowsScrollAmount,
+                  duration: arrowsScrollDuration,
+                  curve: curve,
+                );
+              } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+                scrollController.animateTo(
+                  scrollController.offset + arrowsScrollAmount,
+                  duration: arrowsScrollDuration,
+                  curve: curve,
+                );
+              }
             }
           }
         },
